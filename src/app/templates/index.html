@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Usage Chatbot</title>
+    <style>
+        /* Divvy-inspired color palette */
+        :root {
+            --light-blue: #00AEEF;
+            --dark-blue: #ff00ae;
+            --white: #000000;
+            --gray: #3b3b3b;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--gray);
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: var(--light-blue);
+            color: var(--white);
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h1 {
+            color: black;
+            /* Title changed to black */
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid var(--dark-blue);
+            border-radius: 5px;
+            width: 60%;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: var(--dark-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--light-blue);
+        }
+
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--white);
+            border: 1px solid var(--light-blue);
+            border-radius: 5px;
+            width: 60%;
+            white-space: pre-wrap;
+            font-family: "Courier New", Courier, monospace;
+        }
+    </style>
+    <script>
+        async function sendQuery() {
+            const userQuery = document.getElementById("user-query").value;
+            const responseBox = document.getElementById("response");
+            responseBox.innerText = "Loading...";
+
+            try {
+                const response = await fetch("/query", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ user_query: userQuery })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    responseBox.innerHTML = marked.parse(data.response);
+                } else {
+                    responseBox.innerText = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                responseBox.innerText = `Error: ${error.message}`;
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Divvy Bike Dataset Chatbot</h1>
+    </header>
+    <main>
+        <p>Ask questions about the analyzed Divvy bike dataset:</p>
+        <input type="text" id="user-query" placeholder="Type your query here" />
+        <button onclick="sendQuery()">Go!</button>
+        <p><strong>Answer:</strong></p>
+        <div id="response"></div>
+    </main>
+</body>
+
+</html>
